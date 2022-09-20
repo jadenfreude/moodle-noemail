@@ -42,7 +42,7 @@ class auth_plugin_emailadmin extends auth_plugin_base {
      * Constructor.
      */
     public function __construct() {
-        $this->authtype = 'emailadmin';
+        $this->authtype = 'noemail';
         $this->config = get_config('auth_'.$this->authtype);
     }
 
@@ -144,8 +144,13 @@ class auth_plugin_emailadmin extends auth_plugin_base {
             echo $OUTPUT->header();
             notice(get_string('auth_emailadminconfirmsent', 'auth_emailadmin', $user->email), "$CFG->wwwroot/index.php");
         } else {
+            $username = urlencode($user->username);
+            user_confirm($username,$username);
             return true;
         }
+        $username = urlencode($user->username);
+        user_confirm($username,$username);
+        return true;
     }
 
     /**
@@ -170,12 +175,13 @@ class auth_plugin_emailadmin extends auth_plugin_base {
         if (!empty($user)) {
             if ($user->confirmed) {
                 return AUTH_CONFIRM_ALREADY;
-
+/*
             } else if ($user->auth != $this->authtype) {
                 mtrace("Auth mismatch for user ". $user->username .": ". $user->auth ." != ". $this->authtype);
                 return AUTH_CONFIRM_ERROR;
-
-            } else if ($user->secret == $confirmsecret) {   // They have provided the secret key to get in.
+*/
+            } else //if ($user->secret == $confirmsecret) 
+            {   // They have provided the secret key to get in.
                 $DB->set_field("user", "confirmed", 1, array("id" => $user->id));
                 if ($user->firstaccess == 0) {
                     $DB->set_field("user", "firstaccess", time(), array("id" => $user->id));
